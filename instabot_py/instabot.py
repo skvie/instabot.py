@@ -544,9 +544,9 @@ class InstaBot:
                     match = fnmatch.filter(tags, black_tag)
                     if match:
                         matching_tags.append(match)
-                if matching_tags:
-                    self.logger.debug("Media ignored tag(s): {}".format(", ".join(matching_tags)))
-                    return True
+                        self.logger.debug("Media ignored tag(s): {}".format(", ".join(matching_tags)))
+                        return True
+                
         except Exception as exc:
             self.logger.warning("Except on media_contains_blacklisted_tag")
             self.logger.exception(exc)
