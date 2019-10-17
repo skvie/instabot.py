@@ -13,7 +13,7 @@ import random
 import re
 import signal
 import time
-
+import fnmatch
 import instaloader
 import requests
 from config42 import ConfigManager
@@ -529,7 +529,7 @@ class InstaBot:
         except Exception as exc:
             logging.exception(exc)
 
-    def media_contains_blacklisted_tag(self, media):
+    def media_contains_blacklisted_tag(self,media):
         try:
             if len(media["node"]["edge_media_to_caption"]["edges"]) > 1:
                 caption = media["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"].encode(
@@ -538,8 +538,12 @@ class InstaBot:
                 tag_blacklist = set(self.tag_blacklist)
                 tags = {tag.decode("ASCII").strip("#").lower()
                         for tag in caption.split()
-                        if (tag.decode("ASCII")).startswith("#")}
-                matching_tags = tags.intersection(tag_blacklist)
+                        if (tag.decode("ASCII")).startswith("#")}    
+                matching_tags = []
+                for black_tag in tag_blacklist:
+                    match = fnmatch.filter(tags, black_tag)
+                    if match:
+                        matching_tags.append(match)
                 if matching_tags:
                     self.logger.debug("Media ignored tag(s): {}".format(", ".join(matching_tags)))
                     return True
