@@ -51,7 +51,7 @@ class InstaBot:
     url_media = "https://www.instagram.com/p/%s/"
     url_user_detail = "https://www.instagram.com/%s/"
     api_user_detail = "https://i.instagram.com/api/v1/users/%s/info/"
-
+    FOLLOW_CAP = 7500
     def __init__(self, config=None, **kwargs):
         self.logger = logging.getLogger(self.__class__.__name__)
         if not config:
@@ -664,6 +664,15 @@ class InstaBot:
             url_follow = self.url_follow % user_id
             if username is None:
                 username = self.get_username_by_user_id(user_id=user_id)
+            follow_count = self.get_followers_count(self.user_login);
+            
+            if follow_count >= self.FOLLOW_CAP:
+                self.logger.info(f"Follow cap reached. Not following {self.url_user(username)}")
+                self.follow_per_run = 0
+                return False
+            else:
+                self.follow_per_run = int(self.config.get("follow_per_run"))
+                
             try:
                 resp = self.s.post(url_follow)
                 if resp.status_code == 200:
